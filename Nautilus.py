@@ -51,12 +51,19 @@ class User:
     
     def get_name(self):return self.name
 
+    def __repr__(self):
+        return str(self.name)
+
 
 class Terminal:
 
     def __init__(self):
         self.root_user = User('root') 
-        
+        self.users = []
+        self.users.append(self.root_user)
+        print(self.users)
+
+        #Creating root folder
         self.root = {}
         self.root_folder = Folder('/')
         self.root[self.root_folder] = {}
@@ -68,10 +75,10 @@ class Terminal:
         # When the program starts
         self.cur_dir = self.root
         self.cur_path = '/'
-    #Defining global variables
+        self.cur_terminaluser = self.root_user
         while True:
             #Display the terminal
-            promt = self.root_user.get_name() + ':' + self.cur_path + '$ '
+            promt = self.cur_terminaluser.get_name() + ':' + self.cur_path + '$ '
             # Receive comman string
             command = input(str(promt))
             command = command.split()
@@ -108,6 +115,10 @@ class Terminal:
 
             elif command[0] == 'rmdir':
                 self.removeDir_command(command,self.cur_dir)
+
+            elif command[0] == 'adduser':
+                self.adduser_command(command,self.users, self.cur_terminaluser)
+
 
             else: print('Bad option')
 
@@ -627,6 +638,25 @@ class Terminal:
                     break                
             print(cur_dir)
             
+
+    def adduser_command(self, command ,user_list, current_user ):
+        if current_user.get_name() != 'root':
+            print("adduser: Operation not permitted") 
+            return
+
+        if len(command) == 1:
+            print("adduser: Incorrect syntax")
+        elif len(command) == 2:
+            names = []
+            #Comprobar si el usuario existe
+            for i in range(len(user_list)):
+                names.append(user_list[i].get_name())
+            if command[1] in names:
+                print('The user already exist')
+            else:
+                new_user = User(command[1])
+                user_list.append(new_user)
+
 
     def ls_command(self,command):
         if len(command) == 1:
