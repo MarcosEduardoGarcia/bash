@@ -122,6 +122,9 @@ class Terminal:
             elif command[0] == 'deluser':
                 self.delususer_command(command,self.users,self.cur_terminaluser)
 
+            elif command[0] == 'su':
+                self.su_command(command,self.users,self.cur_terminaluser)
+
 
             else: print('Bad option')
 
@@ -682,6 +685,21 @@ class Terminal:
             else:
                 print('deluser: The user does not exist')
             print(user_list)
+
+    def su_command(self,command,user_list,current_user):
+        if len(command) == 1:
+            self.cur_terminaluser = self.root_user
+        elif len(command) == 2:
+            names = []
+            #Comprobar si el usuario existe
+            for i in range(len(user_list)):
+                names.append(user_list[i].get_name())
+            if command[1] in names:
+                indice = names.index(command[1])
+                current_user  = user_list[indice]
+                self.cur_terminaluser = current_user
+            else:
+                print('su: Invalid user')
 
     def ls_command(self,command):
         if len(command) == 1:
