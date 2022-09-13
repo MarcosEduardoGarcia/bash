@@ -118,6 +118,9 @@ class Terminal:
 
             elif command[0] == 'adduser':
                 self.adduser_command(command,self.users, self.cur_terminaluser)
+            
+            elif command[0] == 'deluser':
+                self.delususer_command(command,self.users,self.cur_terminaluser)
 
 
             else: print('Bad option')
@@ -657,6 +660,28 @@ class Terminal:
                 new_user = User(command[1])
                 user_list.append(new_user)
 
+
+    def delususer_command(self, command,user_list,current_user):
+        if current_user.get_name() != 'root':
+            print("deluser: Operation not permitted") 
+            return
+
+        if len(command) == 1:
+            print("adduser: Incorrect syntax")
+        elif len(command) == 2:
+            names = []
+            if command[1] == 'root':
+                print('WARNING: You are just about to delete the root account Usually this is never required as it may render the whole system unusable If you really want this, call deluser with parameter --force (but this `deluser` does not allow `--force`, haha) Stopping now without having performed any action')
+                return
+            #Comprobar si el usuario existe
+            for i in range(len(user_list)):
+                names.append(user_list[i].get_name())
+            if command[1] in names:
+                indice = names.index(command[1])
+                del user_list[indice]
+            else:
+                print('deluser: The user does not exist')
+            print(user_list)
 
     def ls_command(self,command):
         if len(command) == 1:
