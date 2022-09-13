@@ -102,7 +102,7 @@ class Terminal:
                 print(self.cur_path)
             
             elif command[0] == 'exit':
-                print('bye,', self.root_user.get_name())
+                print('bye,', self.cur_terminaluser.get_name())
 
             elif command[0] == 'cp':
                 self.copy_command(command, self.cur_dir)
@@ -137,43 +137,33 @@ class Terminal:
             counter = 0
             #cur_dict = self.root
             aux = cur_dir
-            print(cur_dir)
             for i in range(len(result)):
                 keys = list(aux.keys())
                 keys = [str(x) for x in keys]
                 object_keys = list(aux.keys())
-                print('Llaves de actual aux')
+
                 if result[i] in keys:
-                    print('Entre aqui')
                     indice = keys.index(result[i])
                     if object_keys[indice].get_type() == 'd':
-                        print('Entre a checar si era un directorio')
                         aux = aux[object_keys[indice]]
                     else:
-                        print('No se puede por hay')
+                        print('mkdir: Ancestor directory does not exist')
                         break
-                    print('Nuevo dictionary')
-                    print(aux)
                     counter += 1
-                    print('COunter llego a')
-                    print(counter)
                 elif result[i] not in keys and i == len(result)-1:
                     self.folder = Folder(result[i])
                     aux[self.folder] = {}
                 else:
-                    print('mamo en algun lado')
+                    print('mkdir: Ancestor directory does not exist')
                     break
             if counter == len(result):
                     print('mkdir:file exists')
-            print(cur_dir)
         elif len(command) == 3:
             if command[1] == '-p':
                 result = self.analize_string(command[2])
                 aux = cur_dir
                 if isinstance(result,list):
-                    print('LLegue aqui siuuu')
                     aux = cur_dir
-                    print('Path del inicio')
                     print(aux)
                     keys = list(aux.keys())
                     keys = [str(x) for x in keys]
@@ -193,50 +183,36 @@ class Terminal:
                             aux[self.folder] = {}
                             aux = aux[self.folder]
                             #print(aux)
-                    print(cur_dir)
                     #print(self.root)
             else:
                 print('mkdir: Invalid syntax')
 
     def touch_command(self,command,cur_dir):
-        print(command)
         if len(command) == 1:
             print('touch: Invalid Syntax')
         elif len(command) == 2:
-            print('Entre al caso')
             result = self.analize_string(command[1])
             aux = cur_dir
             counter = 0
             for i in range(len(result)):
-                print('entre aqui')
                 keys = list(aux.keys())
                 keys = [str(x) for x in keys]
                 object_keys = list(aux.keys()) 
                 if result[i] in keys:
-                    print('entre al if')
                     indice = keys.index(result[i])
-                    print('nombre del folder')
-                    print(object_keys)
-                    print("Atributos del objeto")
-                    print(object_keys[indice].get_name())
                     if object_keys[indice].get_type() == 'd':
                         aux = aux[object_keys[indice]]
-                        print('Nuevo dictionary')
-                        print(aux)
                         counter += 1
                     else:
                         pass
                 else:
                     self.file = File(result[i])
                     aux[self.file] = None
-            print(cur_dir)
 
     def cd_command(self, command, cur_dir, cur_path):
         if len(command) == 1:
-            print('Entre aqui a lo facil segun')
             self.cur_path = '//'
             self.cur_dir = self.root
-            print(self.cur_dir)
         elif len(command) == 2:
             result = self.analize_string(command[1])
             if result[0] == '':
@@ -247,11 +223,15 @@ class Terminal:
                 print(result[i])
                 a = self.cd_enter_out(result[i],self.cur_dir,self.cur_path)
                 if a == 1 :
-                    print('Mamo en algun lado')
+                    print('cd: No such file or directory')
                     self.cur_dir = dir_inicial
                     self.cur_path = path_inicial
                     break
-            print(self.cur_dir)
+                elif a == 2:
+                    print('cd: Destination is a file')
+                    self.cur_dir = dir_inicial
+                    self.cur_path = path_inicial
+                    break
             print(self.cur_path)
 
     def cd_enter_out(self,result,cur_dir, cur_path):
@@ -259,50 +239,52 @@ class Terminal:
         keys = [str(x) for x in keys]
         object_keys = list(cur_dir.keys()) 
         if result in keys:
-            print('Entre al segundo')
             indice = keys.index(result)
-            #print(type(object_keys[indice]))
-            #print(indice)
-            cur_dir = cur_dir[object_keys[indice]]
-            cur_path = cur_path +  '/' + result 
-            self.cur_dir = cur_dir
-            self.cur_path = cur_path
+            if object_keys[indice].get_type() == 'd':
+                cur_dir = cur_dir[object_keys[indice]]
+                cur_path = cur_path +  '/' + result 
+                self.cur_dir = cur_dir
+                self.cur_path = cur_path
+            else:
+                flag = 2
+                return flag
+            print('current path')
             print(cur_path)
         elif result == '..':
-            print('Entre al else de ..')
-            print(object_keys)
-            print('Esto tiene result antes')
-            print(self.cur_path)
             slashes = [pos for pos,char in enumerate(cur_path) if char == '/']
             if len(slashes) == 1:
                 cur_path = '//'
             else:
+                #Imprime el path hasta antes de la ultima slash
                 cur_path = cur_path[:max(slashes)]
             self.cur_path = cur_path
-            print('El current path es')
-            print(self.cur_path)
-            #Acceder al diccionario 
-            #Navegar desde el diccionario iniciar 
-            # Hasta llegar al path previo
-            aux = self.root
-            result = self.analize_string(self.cur_path)
-            print('esto tiene result')
-            print(result)
-            if result[0] == '' and result[1] == '':
-                print('Entre al ultimo if mamalon')
-                self.cur_dir = aux
-            elif isinstance(result,list):
-                print('Path del inicio')
+            print('Current path ..')
+            print(cur_path)
+            
+            if cur_path == '/':
+                aux = self.root_bin
+                result = ['/']
+                print('Regresamos al origen tenemos que entrar')
+                print(result)
+            else:
+                aux = self.root
+                print('esto tiene aux osea igual a root')
                 print(aux)
+                result = self.analize_string(self.cur_path)
+                print(result)
+                result = result[2:]
+                print(result)
+            if isinstance(result,list):
                 for i in range(len(result)):
                     keys = list(aux.keys())
                     keys = [str(x) for x in keys]
                     object_keys = list(aux.keys()) 
                     if result[i] in keys:
-                        print('cruce aqui')
                         indice = keys.index(result[i])
                         aux = aux[object_keys[indice]]
                         self.cur_dir = aux
+                        print('Current dictionay')
+                        print(self.cur_dir)
         elif result == '.' :
             pass        
         else:
