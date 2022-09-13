@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-
-from urllib.parse import non_hierarchical
-
-
 class File:
     type_file = '-' 
     read_ow = 'r'
@@ -109,6 +105,9 @@ class Terminal:
 
             elif command[0] == 'rm':
                 self.remove_command(command,self.cur_dir)
+
+            elif command[0] == 'rmdir':
+                self.removeDir_command(command,self.cur_dir)
 
             else: print('Bad option')
 
@@ -565,16 +564,12 @@ class Terminal:
                     if i == len(result) - 1:
                         print('Y luego aqui')
                         if object_keys[indice].get_type() == 'd':
-                            print('Source is a directory')
+                            print('rm: Is is a directory')
                         else:
                             print('Existe el file')
-                            flag = 1
-                            self.objeto = object_keys[indice]
                             print('Amooooos a borrarlo')
                             del aux[object_keys[indice]]
-                            self.original_source = aux
                             print(aux)
-                            return flag
                     else:
                         print('LLegue al else')
                         aux = aux[object_keys[indice]]
@@ -585,6 +580,50 @@ class Terminal:
                 else:
                     #En algun punto la ruta no existio
                     print('cp: No such file')    
+                    break                
+            print(cur_dir)
+
+    def removeDir_command(self, command, cur_dir):
+        if len(command) == 1:
+            print('rmdir: Invalid Syntax')
+        elif len(command) == 2:
+            print('Entre al caso')
+            result = self.analize_string(command[1])
+            aux = cur_dir
+            counter = 0
+            for i in range(len(result)):
+                print('entre aqui')
+                keys = list(aux.keys())
+                keys = [str(x) for x in keys]
+                object_keys = list(aux.keys()) 
+                if result[i] in keys:
+                    print('entre al if')
+                    indice = keys.index(result[i])
+                    if i == len(result) - 1:
+                        print('Y luego aqui')
+                        if object_keys[indice].get_type() == 'd':
+                            print('rm: Is is a directory')
+                            print('Amooooos a borrarlo')
+                            print (aux[object_keys[indice]])
+                            if aux[object_keys[indice]]:
+                                print('Hay algo ahi cabron namames')
+                                break
+                            else:
+                                del aux[object_keys[indice]]
+                            print(aux)
+                        else:
+                            print('rmdir: Not a directory')
+                    else:
+                        #Avanzamos
+                        print('LLegue al else')
+                        aux = aux[object_keys[indice]]
+                        print('eL NUEVO diccionario es')
+                        print(aux)  
+                        print('sus llaves son')
+                        print(aux.keys())  
+                else:
+                    #En algun punto la ruta no existio
+                    print('rmdir: No such file or directory')    
                     break                
             print(cur_dir)
             
